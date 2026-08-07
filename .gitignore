@@ -1,0 +1,17 @@
+# Disposable source checkouts
+/workspace/
+
+# Locally downloaded or generated transcripts
+/lectures/*/transcripts/*
+!/lectures/*/transcripts/.gitkeep
+
+# Obsidian machine/session state
+/.obsidian/workspace.json
+/.obsidian/workspace-mobile.json
+/.obsidian/cache/
+
+# Common local files
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

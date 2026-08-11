@@ -308,6 +308,85 @@ $$
 Back propagation is just a recursive application of the calculus chain rule backwards through the computation graph.
 
 ![[attachments/Pasted image 20260811011735.png]]
+
+### Preview of a single optimization step
+
+We are going to try to nudge our inputs to make $L$ go up.
+If we want $L$ to go up, that means we have to go in the direction of the gradient.
+
+```python
+a.data += 0.01 * a.grad
+b.data += 0.01 * b.grad
+c.data += 0.01 * c.grad
+f.data += 0.01 * f.grad
+```
+
+We are nudging just the leaf nodes (not nodes like $e$ and $d$ which composed from operations on other nodes).  Then we run forward propagation once more:
+
+```python
+e = a * b
+d = e + c
+L = d * f
+```
+
+and we get:
+
+$L = -7.286496$
+
+ie, the loss function went from -8 to -7.286496, and this is useful when training neural networks which we will do soon.
+### Manual backpropagation through a neuron
+
+a neuron consists of inputs and weights.  a 2 dimensional neuron has 2 inputs.  the weights are the synaptic strength for each input.
+
+
+```python
+# inputs x1, x2
+x1 = Value(2.0, label='x1')
+x2 = Value(0.0, label='x2')
+
+# weights w1, w2
+w1 = Value(-3.0, label='w1')
+w2 = Value(1.0, label='w2')
+
+# bias of the neuron
+b = Value(6.7, label = 'b')
+
+
+# x1*w1 + x2*w2 + b (broken down so that we have pointers to all the intermediate nodes)
+x1w1 = x1*w1; x1w1.label = 'x1*w1'
+x2w2 = x2*w2; x1w1.label = 'x2*w2'
+x1w1x2w2 = x1w1 + x2w2; x1w1x2w2.label = 'x1w1 + x2w2'
+
+# cell body (without the activation function)
+n = x1w1x2w2 + b; n.label = 'n'
+```
+
+![[attachments/Pasted image 20260811214824.png]]
+
+Now we take this through an activation (or squashing) function. We will use tanh(hyperbolic tangent)
+
+
+![[attachments/Pasted image 20260811221616.png]]
+And now we derive everything backwards.
+
+To take the derivative of tanh, we use the [derivative function of tanh](https://en.wikipedia.org/wiki/Hyperbolic_functions#Derivatives).
+$$
+\frac{d}{dx} tanh x = 1 - tanh^2 x
+$$
+
+We know that $o = tanh(n)$, so:
+$$ \frac{do}{dn} = 1 - tanh^2(n) = 1 - o^2 = 1- 0.7071067811865476^2 = 0.5$$
+
+Because the next operation is a $+$, we know that the gradient simply flows through, ie, the derivative is $1$, we apply the chain rule and multiply $1 * 0.5$, therefore:
+$$
+\begin{aligned}
+\frac{dn}{b} &= 0.5 \\
+\frac{dn}{x1w1+x2w2} &= 0.5
+\end{aligned}
+$$
+Doing the backpropagation by calculating derivatives and using chain rule as before, we get:
+
+![[attachments/Pasted image 20260811222204.png]]
 ## Summary
 
 ## Key concepts
